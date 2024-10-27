@@ -218,3 +218,16 @@ root@testpc:~# docker logs -f relaxed_bartik
 192.168.227.1 - - [27/Oct/2024:20:29:25 +0000] "GET /favicon.ico HTTP/1.1" 404 555 "http://192.168.227.128/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" "-"
 192.168.227.1 - - [27/Oct/2024:20:29:54 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" "-"
 ```
+
+Now we want to stop the container:
+```
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                               NAMES
+35e955a5179e   nginx     "/docker-entrypoint.…"   15 minutes ago   Up 15 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp   relaxed_bartik
+root@testpc:~#
+root@testpc:~# docker container stop relaxed_bartik
+relaxed_bartik
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+root@testpc:~#
+```
