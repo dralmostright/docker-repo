@@ -231,3 +231,24 @@ root@testpc:~# docker container ls
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 root@testpc:~#
 ```
+
+List down all the container that was executed so far:
+```
+root@testpc:~/docker-repo/01.docker-basics# docker container ls -a
+CONTAINER ID   IMAGE             COMMAND                  CREATED          STATUS                      PORTS     NAMES
+35e955a5179e   nginx             "/docker-entrypoint.…"   19 minutes ago   Exited (0) 3 minutes ago              relaxed_bartik
+55de6358a340   hello-world       "/hello"                 34 minutes ago   Exited (0) 34 minutes ago             frosty_yonath
+root@testpc:~/docker-repo/01.docker-basics#
+
+```
+
+Run Vs Start Container:
+Run is used when we want to start a new container, which is never executed before. However if we want to re-run the existing container we will need to use start.
+```
+root@testpc:~# docker container start 35e955a5179e
+35e955a5179e
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS         PORTS                               NAMES
+35e955a5179e   nginx     "/docker-entrypoint.…"   23 minutes ago   Up 7 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp   relaxed_bartik
+root@testpc:~#
+```
