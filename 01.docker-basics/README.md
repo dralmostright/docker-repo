@@ -291,3 +291,13 @@ root@testpc:~# docker container ls -a
 CONTAINER ID   IMAGE             COMMAND                  CREATED       STATUS                     PORTS     NAMES
 root@testpc:~#
 ```
+
+Docker containers will be run as seperate process instead of vm where whole Guest O/S will need to run:
+```
+root@testpc:~# ps -ef | grep nginx
+root      205238  205215  0 02:50 ?        00:00:00 nginx: master process nginx -g daemon off;
+systemd+  205286  205238  0 02:50 ?        00:00:00 nginx: worker process
+systemd+  205287  205238  0 02:50 ?        00:00:00 nginx: worker process
+root      205430   38464  0 02:51 pts/2    00:00:00 grep --color=auto nginx
+root@testpc:~#
+```
