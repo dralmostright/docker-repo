@@ -181,5 +181,40 @@ Status: Downloaded newer image for nginx:latest
 35e955a5179e7d4923023cae528f6d34d25ce7a42b5571449c18b1d5c8f6b328
 root@testpc:~/docker-repo/01.docker-basics#
 ```
-We have downloaded the image off nginx server and now lets try to access it via web browser
+We have downloaded the image of nginx server and its instance is running. The --pubhish flag states the port 80 of docker instance is exposed on host on same port 80, and we can do that on any available port on host and --detatch refers to run the instnace in background. Now lets try to access it via web browser.
 ![nginx server](./imgs/img1.png)
+
+
+Now lets check for running docker containers:
+```
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                               NAMES
+35e955a5179e   nginx     "/docker-entrypoint.…"   10 minutes ago   Up 10 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp   relaxed_bartik
+root@testpc:~#
+```
+
+And if we want to see the logs of docker container instance:
+```
+root@testpc:~# docker logs -f relaxed_bartik
+/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
+10-listen-on-ipv6-by-default.sh: info: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf
+/docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+/docker-entrypoint.sh: Configuration complete; ready for start up
+2024/10/27 20:28:59 [notice] 1#1: using the "epoll" event method
+2024/10/27 20:28:59 [notice] 1#1: nginx/1.27.2
+2024/10/27 20:28:59 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14)
+2024/10/27 20:28:59 [notice] 1#1: OS: Linux 5.13.0-51-generic
+2024/10/27 20:28:59 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2024/10/27 20:28:59 [notice] 1#1: start worker processes
+2024/10/27 20:28:59 [notice] 1#1: start worker process 30
+2024/10/27 20:28:59 [notice] 1#1: start worker process 31
+192.168.227.1 - - [27/Oct/2024:20:29:25 +0000] "GET / HTTP/1.1" 200 615 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" "-"
+2024/10/27 20:29:25 [error] 31#31: *1 open() "/usr/share/nginx/html/favicon.ico" failed (2: No such file or directory), client: 192.168.227.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "192.168.227.128", referrer: "http://192.168.227.128/"
+192.168.227.1 - - [27/Oct/2024:20:29:25 +0000] "GET /favicon.ico HTTP/1.1" 404 555 "http://192.168.227.128/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" "-"
+192.168.227.1 - - [27/Oct/2024:20:29:54 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" "-"
+```
