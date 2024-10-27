@@ -163,3 +163,23 @@ REPOSITORY        TAG       IMAGE ID       CREATED         SIZE
 hello-world       latest    d2c94e258dcb   18 months ago   13.3kB
 root@testpc:~/docker-repo/01.docker-basics#
 ```
+
+Now lets run the docker in detatch mode as we want the instance be running on background:
+```
+root@testpc:~/docker-repo/01.docker-basics# docker container run --publish 80:80 --detach nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+a480a496ba95: Pull complete
+f3ace1b8ce45: Pull complete
+11d6fdd0e8a7: Pull complete
+f1091da6fd5c: Pull complete
+40eea07b53d8: Pull complete
+6476794e50f4: Pull complete
+70850b3ec6b2: Pull complete
+Digest: sha256:28402db69fec7c17e179ea87882667f1e054391138f77ffaf0c3eb388efc3ffb
+Status: Downloaded newer image for nginx:latest
+35e955a5179e7d4923023cae528f6d34d25ce7a42b5571449c18b1d5c8f6b328
+root@testpc:~/docker-repo/01.docker-basics#
+```
+We have downloaded the image off nginx server and now lets try to access it via web browser
+<img src="./imgs/img1.png>
