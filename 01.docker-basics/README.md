@@ -182,4 +182,4 @@ Status: Downloaded newer image for nginx:latest
 root@testpc:~/docker-repo/01.docker-basics#
 ```
 We have downloaded the image off nginx server and now lets try to access it via web browser
-<img src="./imgs/img1.png>
+![nginx server](./imgs/img1.png)
