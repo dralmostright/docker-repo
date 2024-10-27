@@ -263,3 +263,31 @@ CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS       
 abfddc1f24c5   nginx     "/docker-entrypoint.…"   11 seconds ago   Up 10 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp   nginx80
 root@testpc:~#
 ```
+
+Identify the top running process:
+```
+root@testpc:~# docker container top nginx80
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+root                201873              201844              0                   02:42               ?                   00:00:00            nginx: master process nginx -g daemon off;
+systemd+            201921              201873              0                   02:42               ?                   00:00:00            nginx: worker process
+systemd+            201922              201873              0                   02:42               ?                   00:00:00            nginx: worker process
+root@testpc:~#
+```
+
+Removing the containers:
+```
+root@testpc:~# docker container ls -a
+CONTAINER ID   IMAGE             COMMAND                  CREATED          STATUS                      PORTS     NAMES
+abfddc1f24c5   nginx             "/docker-entrypoint.…"   4 minutes ago    Exited (0) 3 seconds ago              nginx80
+35e955a5179e   nginx             "/docker-entrypoint.…"   32 minutes ago   Exited (0) 6 minutes ago              relaxed_bartik
+55de6358a340   hello-world       "/hello"                 47 minutes ago   Exited (0) 47 minutes ago             frosty_yonath
+root@testpc:~#
+root@testpc:~# docker container rm abfddc1f24c5 35e955a5179e 55de6358a340
+abfddc1f24c5
+35e955a5179e
+55de6358a340
+root@testpc:~#
+root@testpc:~# docker container ls -a
+CONTAINER ID   IMAGE             COMMAND                  CREATED       STATUS                     PORTS     NAMES
+root@testpc:~#
+```
