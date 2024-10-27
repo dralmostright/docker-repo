@@ -252,3 +252,14 @@ CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS       
 35e955a5179e   nginx     "/docker-entrypoint.…"   23 minutes ago   Up 7 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp   relaxed_bartik
 root@testpc:~#
 ```
+
+Give name to docker container:
+```
+root@testpc:~# docker container run --publish 80:80 --detach --name nginx80 nginx
+abfddc1f24c515f0ddf3abe726e7e3713d203b298bb418f178f5ffbb77314a6b
+root@testpc:~#
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                               NAMES
+abfddc1f24c5   nginx     "/docker-entrypoint.…"   11 seconds ago   Up 10 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp   nginx80
+root@testpc:~#
+```
