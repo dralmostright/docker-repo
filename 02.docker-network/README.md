@@ -197,8 +197,8 @@ root@testpc:~#
 ```
 
 ### Docker network DNS
-```
 Containers uses DNS to communicate, they don't use IP address to communicate.
+```
 root@testpc:~# docker container ls
 CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                   NAMES
 406e32948fc2   nginx     "/docker-entrypoint.…"   21 minutes ago   Up 21 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp   mynginx
