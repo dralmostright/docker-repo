@@ -84,4 +84,43 @@ The above command tagged image with new name copying as new image. When you didn
 #### Dockerfile
 Docker images can be build automatically by reading the instructions from a Dockerfile. A dockerfile is a text (yaml syntax) that contains all the commands a user could call on the command line to assemble an image. A docker image consists of read-only layers each of which represents a Dockerfile instruction.
 
+FROM : The FROM instruction initializes a new build stage and sets the base Image form subsquent instructions and a dockerfile to be valid it must start with FROM instruction with base image being any valid image.
+LABEL : LABEL added to image to orginie images by project, record lisencing information. Each label will have one or more key-value pairs e.g. LABEL client="ABC Industries"
+RUN : RUN instruction will execute any commands in a new layer on top of hte current image and commit the results e.g.
+```
+FROM ubuntu:16.04
+RUN apt-get update
+RUN apt-get install -y ftp
+```
+CMD : CMD instruction should be used to run the software contained by your image, along with any arguments. There can be only one CMD instruction in Dockerfile. If we have multiple, last one will take precedence. Main purpose of a CMD is to provide defaults for executing container.
+EXPOSE : EXPOSE instruction indicates the ports on which a container listens for connections
+ENV : ENV instruction sets the environment variables
+ADD : ADD instruction copies new files, directories or remote file URLS from <src> and adds then to the filesystem of the image at the patch <dest>
+VOLUME : VOLUME instruction should be used to expose any database storage area, configuration storage, or files/folders created by you docker container.
+WORKDIR : WORKDIR instruction sets the working directory for any RUN, CMD, ADD instructions that follow it in DockerFile.
 
+```
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file into the container at /app
+COPY requirements.txt requirements.txt
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the current directory contents into the container at /app
+COPY . .
+
+# Define environment variable
+ENV NAME World
+
+# Expose port 80
+EXPOSE 80
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]
+```
