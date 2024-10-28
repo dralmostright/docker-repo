@@ -89,3 +89,59 @@ root@testpc:~# docker network inspect bridge
 ]
 root@testpc:~#
 ```
+
+Create Network for docker:
+```
+root@testpc:~# docker network create dockernet
+e0e64fb87c893d476c65a9cb139c802ddcc0248fffa1886fd09ec752a505de88
+root@testpc:~# docker network ls
+NETWORK ID     NAME         DRIVER    SCOPE
+07edd7f45c33   bridge       bridge    local
+8e0ff381a56e   docker_net   bridge    local
+e0e64fb87c89   dockernet    bridge    local
+03eefb956fe3   host         host      local
+adb864e44803   none         null      local
+root@testpc:~#
+```
+Above command creates 'bridge' network by default 
+
+```
+root@testpc:~# docker network inspect dockernet
+[
+    {
+        "Name": "dockernet",
+        "Id": "e0e64fb87c893d476c65a9cb139c802ddcc0248fffa1886fd09ec752a505de88",
+        "Created": "2024-10-28T05:59:23.496927148+05:45",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.19.0.0/16",
+                    "Gateway": "172.19.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]
+root@testpc:~# docker network inspect -f "{{.Name}} {{.Containers}}" dockernet
+dockernet map[]
+root@testpc:~#
+```
+
+### Connect Network with Container
+A container can by connected to a network by container name or by ID. After connection the container can communicate with other containers in the same network.
+
