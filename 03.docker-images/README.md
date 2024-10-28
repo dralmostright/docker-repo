@@ -349,11 +349,18 @@ Successfully built 8354333cd5a4
 Successfully tagged testnginx:0.0.1
 root@testpc:~/docker-repo/03.docker-images#
 ```
-Lets view the images:
+Lets view the images and run the images:
 ```
 root@testpc:~# docker images testnginx
 REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
 testnginx    0.0.1     8354333cd5a4   2 minutes ago   133MB
 root@testpc:~#
+root@testpc:~/docker-repo/03.docker-images# docker run -d -p 8080:80  testnginx:0.0.1
+ee5620a3d5f5522af70755704b3eb6f782f004ee29c45b6f7cbd0072c9fc1229
+root@testpc:~/docker-repo/03.docker-images#
+root@testpc:~/docker-repo/03.docker-images# docker container ls
+CONTAINER ID   IMAGE             COMMAND                  CREATED          STATUS         PORTS                                   NAMES
+ee5620a3d5f5   testnginx:0.0.1   "nginx -g 'daemon of…"   10 seconds ago   Up 8 seconds   0.0.0.0:8080->80/tcp, :::8080->80/tcp   nifty_swanson
+root@testpc:~/docker-repo/03.docker-images#
 ```
 
