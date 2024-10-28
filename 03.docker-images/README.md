@@ -349,3 +349,11 @@ Successfully built 8354333cd5a4
 Successfully tagged testnginx:0.0.1
 root@testpc:~/docker-repo/03.docker-images#
 ```
+Lets view the images:
+```
+root@testpc:~# docker images testnginx
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+testnginx    0.0.1     8354333cd5a4   2 minutes ago   133MB
+root@testpc:~#
+```
+
