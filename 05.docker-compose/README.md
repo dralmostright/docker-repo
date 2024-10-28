@@ -23,3 +23,21 @@ Components of Docker compose file
 * docker-compose.yml if default name of yml file
 * Custom name can be used by command using flag -f in compose command.
 
+Basic template of docker-compose file
+```
+version : '3'
+
+services : #name for the container
+   servicename1: # container service name
+        image : # optional specify if build specific
+        command: # optional relm and CMD specified in image
+        environment: # optional similar to -e in Docker run command
+        volumes: # optionsl, similar to --mount in docker run
+   servicename2:
+           .....
+
+volumes: # Optional Mounts a linked path on host machine  that can be accessed in containers
+
+networks: # optional same as Docker network
+```
+
