@@ -82,7 +82,7 @@ The above command tagged image with new name copying as new image. When you didn
 ### Build own docker images
 
 #### Dockerfile
-Docker images can be build automatically by reading the instructions from a Dockerfile. A dockerfile is a text (yaml syntax) that contains all the commands a user could call on the command line to assemble an image. A docker image consists of read-only layers each of which represents a Dockerfile instruction.
+Docker images can be build automatically by reading the instructions from a Dockerfile. A dockerfile is a text that contains all the commands a user could call on the command line to assemble an image. A docker image consists of read-only layers each of which represents a Dockerfile instruction.
 
 FROM : The FROM instruction initializes a new build stage and sets the base Image form subsquent instructions and a dockerfile to be valid it must start with FROM instruction with base image being any valid image.
 
