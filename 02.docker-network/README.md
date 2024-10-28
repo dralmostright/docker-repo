@@ -182,3 +182,51 @@ root@testpc:~# docker container inspect nginx80 | grep NetworkID
                     "NetworkID": "e0e64fb87c893d476c65a9cb139c802ddcc0248fffa1886fd09ec752a505de88",
 root@testpc:~#
 ```
+
+Disconnecting Network from container
+```
+root@testpc:~# docker network disconnect dockernet nginx80
+root@testpc:~#
+root@testpc:~# docker network inspect dockernet | grep 'Mac\|IPv4'
+                "MacAddress": "02:42:ac:13:00:02",
+                "IPv4Address": "172.19.0.2/16",
+root@testpc:~# docker container inspect nginx80 | grep End
+            "EndpointID": "a5c22b0f2467d0700ada30fc5efeedafdc097bc742bb0aa0558dfd40ef4b4b1d",
+                    "EndpointID": "a5c22b0f2467d0700ada30fc5efeedafdc097bc742bb0aa0558dfd40ef4b4b1d",
+root@testpc:~#
+```
+
+### Docker network DNS
+```
+Containers uses DNS to communicate, they don't use IP address to communicate.
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+406e32948fc2   nginx     "/docker-entrypoint.…"   21 minutes ago   Up 21 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp   mynginx
+a4b6fe4536ab   nginx     "/docker-entrypoint.…"   4 hours ago      Up 4 hours      0.0.0.0:80->80/tcp, :::80->80/tcp       nginx80
+root@testpc:~#
+root@testpc:~# docker container run -d --name nginxalp --network dockernet nginx:alpine
+Unable to find image 'nginx:alpine' locally
+alpine: Pulling from library/nginx
+43c4264eed91: Pull complete
+d1171b13e412: Pull complete
+596d53a7de88: Pull complete
+f99ac9ba1313: Pull complete
+fd072e74e282: Pull complete
+379754eea6a7: Pull complete
+45eb579d59b2: Pull complete
+472934715761: Pull complete
+Digest: sha256:2140dad235c130ac861018a4e13a6bc8aea3a35f3a40e20c1b060d51a7efd250
+Status: Downloaded newer image for nginx:alpine
+35e5f87de909ce9bbac6b31f0860c00ad2a0a856d856d3b9c59453a1a64b8290
+root@testpc:~#
+root@testpc:~# docker container exec -it nginxalp ping nginx80
+PING nginx80 (172.19.0.3): 56 data bytes
+64 bytes from 172.19.0.3: seq=0 ttl=64 time=0.578 ms
+64 bytes from 172.19.0.3: seq=1 ttl=64 time=0.173 ms
+^C
+--- nginx80 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 0.173/0.375/0.578 ms
+root@testpc:~#
+```
+
