@@ -121,3 +121,57 @@ root@testpc:~# docker volume inspect mysql-data
 ]
 root@testpc:~#
 ```
+
+### Bind Mounts
+Bind mount means a file or directory on the host machine is mounted into a container. Where mapping of host files into a container files. Bind mounts may be store anywhere on the host system. Non-Docker process on the Docker host or Docker container can modify them at any time, but this cannot be done by volumes. Bind Mount can't be used in DockerFile but volumes can be used.
+
+Sharing configuration files from the host machine to containers.
+
+```
+root@testpc:~/bindmount# pwd
+/root/bindmount
+root@testpc:~/bindmount# docker container run -d --name nginxbind --mount type=bind,source=$(pwd),target=/app nginx
+20a0ec604b5f84c0db0ee77dce582abecfc524878aee429f807f2665e5c23504
+root@testpc:~/bindmount# docker container ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS         PORTS                 NAMES
+20a0ec604b5f   nginx     "/docker-entrypoint.…"   10 seconds ago   Up 9 seconds   80/tcp                nginxbind
+81c88706010c   mysql     "docker-entrypoint.s…"   8 minutes ago    Up 8 minutes   3306/tcp, 33060/tcp   mysqldb1
+root@testpc:~/bindmount# ls
+root@testpc:~/bindmount#
+root@testpc:~/bindmount# docker inspect nginxbind | grep -A 5 "Mounts"
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/root/bindmount",
+                    "Target": "/app"
+                }
+--
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/root/bindmount",
+                "Destination": "/app",
+                "Mode": "",
+root@testpc:~/bindmount#
+root@testpc:~/bindmount# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                 NAMES
+20a0ec604b5f   nginx     "/docker-entrypoint.…"   3 minutes ago    Up 3 minutes    80/tcp                nginxbind
+81c88706010c   mysql     "docker-entrypoint.s…"   11 minutes ago   Up 11 minutes   3306/tcp, 33060/tcp   mysqldb1
+root@testpc:~/bindmount# docker exec -it nginxbind bash
+root@20a0ec604b5f:/# cd /app/
+root@20a0ec604b5f:/app# ls
+root@20a0ec604b5f:/app# echo "hello" > index.html
+root@20a0ec604b5f:/app# cat index.html
+hello
+root@20a0ec604b5f:/app# exit
+exit
+root@testpc:~/bindmount# pwd
+/root/bindmount
+root@testpc:~/bindmount# ls -ltr
+total 4
+-rw-r--r-- 1 root root 6 अक्टूबर  28 08:27 index.html
+root@testpc:~/bindmount# cat index.html
+hello
+root@testpc:~/bindmount#
+
+```
