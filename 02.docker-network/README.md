@@ -145,3 +145,40 @@ root@testpc:~#
 ### Connect Network with Container
 A container can by connected to a network by container name or by ID. After connection the container can communicate with other containers in the same network.
 
+```
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED       STATUS       PORTS                               NAMES
+a4b6fe4536ab   nginx     "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:80->80/tcp, :::80->80/tcp   nginx80
+root@testpc:~#
+root@testpc:~#
+root@testpc:~# docker container run -d --name mynginx -p 8082:80 --network dockernet nginx
+406e32948fc274e8307d176582ad1664eb0390bd753796ce7c6ceaa9ef186a50
+root@testpc:~#
+root@testpc:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+406e32948fc2   nginx     "/docker-entrypoint.…"   12 seconds ago   Up 11 seconds   0.0.0.0:8082->80/tcp, :::8082->80/tcp   mynginx
+a4b6fe4536ab   nginx     "/docker-entrypoint.…"   3 hours ago      Up 3 hours      0.0.0.0:80->80/tcp, :::80->80/tcp       nginx80
+root@testpc:~#
+root@testpc:~# docker network inspect -f "{{.Name}} {{.Containers}}" dockernet
+dockernet map[406e32948fc274e8307d176582ad1664eb0390bd753796ce7c6ceaa9ef186a50:{mynginx 3896412f2c990d83862ac6da59be320e0bf4764774114aef7326c289b0f5d553 02:42:ac:13:00:02 172.19.0.2/16 }]
+root@testpc:~#
+root@testpc:~# docker network inspect -f "{{.Name}} {{.IPAM.Config}}" dockernet
+dockernet [{172.19.0.0/16  172.19.0.1 map[]}]
+root@testpc:~#
+```
+
+Now lets connect then newly created network to the running container:
+```
+root@testpc:~# docker network connect dockernet nginx80
+root@testpc:~#
+root@testpc:~# docker network inspect dockernet | grep 'Mac\|IPv4'
+                "MacAddress": "02:42:ac:13:00:02",
+                "IPv4Address": "172.19.0.2/16",
+                "MacAddress": "02:42:ac:13:00:03",
+                "IPv4Address": "172.19.0.3/16",
+root@testpc:~#
+root@testpc:~# docker container inspect nginx80 | grep NetworkID
+                    "NetworkID": "07edd7f45c338ffea5667fcfcd37cd2f2408aee94d43ee9478e62e4b7c34c91f",
+                    "NetworkID": "e0e64fb87c893d476c65a9cb139c802ddcc0248fffa1886fd09ec752a505de88",
+root@testpc:~#
+```
