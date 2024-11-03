@@ -1,0 +1,8 @@
+version : 3
+
+services:
+  destro: 
+    image: alpine
+    restart: always
+    container_name: calpine
+    entrypoint: tail -f /dev/null

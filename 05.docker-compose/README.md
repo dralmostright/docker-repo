@@ -131,3 +131,40 @@ Now lets check if wordpress is accessible:
 ![Word Press](./imgs/img-1.png)
 
 More on docker Compose:
+
+Stopping containers created by compose:
+```
+root@testpc:~# docker compose down
+no configuration file provided: not found
+root@testpc:~#
+root@testpc:~# cd bindmount/
+root@testpc:~/bindmount# docker container ls
+CONTAINER ID   IMAGE              COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+48d2c7cb7f6d   wordpress:latest   "docker-entrypoint.s…"   27 seconds ago   Up 25 seconds   0.0.0.0:8080->80/tcp, :::8080->80/tcp   wordpress
+96f3260d6c8e   mysql:5.7          "docker-entrypoint.s…"   27 seconds ago   Up 26 seconds   3306/tcp, 33060/tcp                     db
+root@testpc:~/bindmount#
+root@testpc:~/bindmount# ls -ltr docker-compose.yml
+-rw-r--r-- 1 root root 939 Oct 27 22:37 docker-compose.yml
+root@testpc:~/bindmount#
+root@testpc:~/bindmount# docker compose down
+[+] Running 3/3
+ ⠿ Container wordpress        Removed                                                                                                                1.2s
+ ⠿ Container db               Removed                                                                                                                1.9s
+ ⠿ Network bindmount_default  Removed                                                                                                                0.1s
+root@testpc:~/bindmount#
+root@testpc:~/bindmount# docker container ls
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+root@testpc:~/bindmount# 
+```
+
+We will create a new docker images by our own:
+```
+version : 3
+
+services:
+  destro: 
+    image: alpine ## Image to download from docker hub
+    restart: always ## Restart always if any issues with instance
+    container_name: calpine ## Give own name instead of system generated name
+    entrypoint: tail -f /dev/null ## An event which will be running forver to keep the instance running.
+ ```
