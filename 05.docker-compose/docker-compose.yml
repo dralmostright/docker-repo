@@ -1,4 +1,4 @@
-version : 3
+version : '3'
 
 services:
   destro: 
@@ -6,3 +6,33 @@ services:
     restart: always
     container_name: calpine
     entrypoint: tail -f /dev/null
+
+  database:
+    image: postgres:latest
+    container_name: pgdatabase
+    restart: always
+    environment: 
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../../bindmount/pgdata:/tmp/
+
+  web:
+    image: nginx
+    restart: always
+    container_name: websrv
+    ports:
+      - "8080:80"
+    volumes:
+      - ../../bindmount/pgdata:/etc/nginx/conf.d/mysite.template
+    environment:
+      - NGINX_HOST=sample.com
+      - NGINX_PORT=80
+    links:
+      - database:db
+      - distro
+
+volumes:
+  pgdata:
+    external:true
