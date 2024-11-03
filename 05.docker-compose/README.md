@@ -129,3 +129,5 @@ root@testpc:~/bindmount#
 
 Now lets check if wordpress is accessible:
 ![Word Press](./imgs/img-1.png)
+
+More on docker Compose:
