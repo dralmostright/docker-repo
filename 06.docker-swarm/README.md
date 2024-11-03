@@ -159,3 +159,44 @@ ae61b5485176   alpine:latest   "ping www.google.com"   9 minutes ago    Up 9 min
 09e55bcc0bdb   alpine:latest   "ping www.google.com"   19 minutes ago   Up 19 minutes             condescending_jepsen.1.qjra5frhgktppq7br1lcbgqk3       
 root@testpc:~/docker-repo#
 ```
+
+Now lets do a sample how docker swarm handles high availability:
+```
+root@testpc:~/docker-repo# docker service ps condescending_jepsen
+ID             NAME                     IMAGE           NODE      DESIRED STATE   CURRENT STATE            ERROR     PORTS
+qjra5frhgktp   condescending_jepsen.1   alpine:latest   testpc    Running         Running 21 minutes ago
+up37jsvy9vs7   condescending_jepsen.2   alpine:latest   testpc    Running         Running 11 minutes ago
+ohb2jrr3lhcx   condescending_jepsen.3   alpine:latest   testpc    Running         Running 11 minutes ago
+qmuen4zlk09n   condescending_jepsen.4   alpine:latest   testpc    Running         Running 11 minutes ago
+root@testpc:~/docker-repo# 
+root@testpc:~/docker-repo# 
+root@testpc:~/docker-repo# docker container rm -f condescending_jepsen.3.ohb2jrr3lhcxh7qc11qkx3sqw
+condescending_jepsen.3.ohb2jrr3lhcxh7qc11qkx3sqw
+root@testpc:~/docker-repo# 
+root@testpc:~/docker-repo# docker service ps condescending_jepsen
+ID             NAME                         IMAGE           NODE      DESIRED STATE   CURRENT STATE            ERROR                         PORTS
+qjra5frhgktp   condescending_jepsen.1       alpine:latest   testpc    Running         Running 21 minutes ago
+up37jsvy9vs7   condescending_jepsen.2       alpine:latest   testpc    Running         Running 12 minutes ago
+wnj7lzjhsk6t   condescending_jepsen.3       alpine:latest   testpc    Running         Running 6 seconds ago
+ohb2jrr3lhcx    \_ condescending_jepsen.3   alpine:latest   testpc    Shutdown        Failed 12 seconds ago    "task: non-zero exit (137)"   
+qmuen4zlk09n   condescending_jepsen.4       alpine:latest   testpc    Running         Running 12 minutes ago
+root@testpc:~/docker-repo# 
+```
+From above we can see even we removed one container the swarm is automatcally bringing up the another one.
+
+To stop the service either we need to sacle it to 0 or remove the servie:
+```
+root@testpc:~/docker-repo# docker service rm condescending_jepsen
+condescending_jepsen
+root@testpc:~/docker-repo#
+root@testpc:~/docker-repo# docker container ls
+CONTAINER ID   IMAGE           COMMAND                 CREATED          STATUS          PORTS     NAMES
+d6603dc72b7e   alpine:latest   "ping www.google.com"   6 minutes ago    Up 6 minutes              condescending_jepsen.3.wnj7lzjhsk6t5qaskan2ed3hq       
+ae61b5485176   alpine:latest   "ping www.google.com"   18 minutes ago   Up 18 minutes             condescending_jepsen.2.up37jsvy9vs7kqgg6fask4y7c       
+7fa93ffa6b60   alpine:latest   "ping www.google.com"   18 minutes ago   Up 18 minutes             condescending_jepsen.4.qmuen4zlk09nkkc68r2wnj1do       
+09e55bcc0bdb   alpine:latest   "ping www.google.com"   28 minutes ago   Up 28 minutes             condescending_jepsen.1.qjra5frhgktppq7br1lcbgqk3       
+root@testpc:~/docker-repo# 
+root@testpc:~/docker-repo# docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+root@testpc:~/docker-repo# 
+```
