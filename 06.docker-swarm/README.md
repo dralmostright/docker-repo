@@ -69,3 +69,93 @@ Commands:
 Run 'docker swarm COMMAND --help' for more information on a command.
 root@testpc:~/docker-repo# 
 ```
+
+Docker services:
+```
+root@testpc:~/docker-repo# docker service --help
+
+Usage:  docker service COMMAND
+
+Manage services
+
+Commands:
+  create      Create a new service
+  inspect     Display detailed information on one or more services
+  logs        Fetch the logs of a service or task
+  ls          List services
+  ps          List the tasks of one or more services
+  rm          Remove one or more services
+  rollback    Revert changes to a service's configuration
+  scale       Scale one or multiple replicated services
+  update      Update a service
+
+Run 'docker service COMMAND --help' for more information on a command.
+root@testpc:~/docker-repo#
+```
+
+Now lets create a service which pings a google.
+
+This will download the alpine latest image and run the command we have given.
+```
+root@testpc:~/docker-repo# docker service create alpine ping www.google.com
+p2kugrgft5a9ybz8gxurn2jrc
+overall progress: 1 out of 1 tasks
+1/1: running   [==================================================>]
+verify: Service converged
+root@testpc:~/docker-repo# docker service ls
+ID             NAME                   MODE         REPLICAS   IMAGE           PORTS
+p2kugrgft5a9   condescending_jepsen   replicated   1/1        alpine:latest   
+root@testpc:~/docker-repo# 
+```
+The ID, Name give are name of service not container names. And we can use docker service inspect to know more detail about the service.
+
+Now to determine which container is executing the service we defined by below command:
+```
+root@testpc:~/docker-repo# docker service ls
+ID             NAME                   MODE         REPLICAS   IMAGE           PORTS
+p2kugrgft5a9   condescending_jepsen   replicated   1/1        alpine:latest   
+root@testpc:~/docker-repo# docker service ps condescending_jepsen
+ID             NAME                     IMAGE           NODE      DESIRED STATE   CURRENT STATE           ERROR     PORTS
+qjra5frhgktp   condescending_jepsen.1   alpine:latest   testpc    Running         Running 7 minutes ago
+root@testpc:~/docker-repo# 
+root@testpc:~/docker-repo# docker container ps | grep qjra5frhgktp
+09e55bcc0bdb   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             condescending_jepsen.1.qjra5frhgktppq7br1lcbgqk3
+root@testpc:~/docker-repo# 
+```
+
+How to scale up the service:
+```
+root@testpc:~/docker-repo# docker service update condescending_jepsen --replicas 4
+condescending_jepsen
+overall progress: 4 out of 4 tasks
+1/4: running   [==================================================>]
+2/4: running   [==================================================>]
+3/4: running   [==================================================>]
+4/4: running   [==================================================>]
+verify: Service converged
+root@testpc:~/docker-repo# docker service ls
+ID             NAME                   MODE         REPLICAS   IMAGE           PORTS
+p2kugrgft5a9   condescending_jepsen   replicated   4/4        alpine:latest
+root@testpc:~/docker-repo#
+```
+The above command will create 4 replica which will be running our service i.e. ping google.com
+```
+root@testpc:~/docker-repo# docker service ps condescending_jepsen
+ID             NAME                     IMAGE           NODE      DESIRED STATE   CURRENT STATE                ERROR     PORTS
+qjra5frhgktp   condescending_jepsen.1   alpine:latest   testpc    Running         Running 11 minutes ago
+up37jsvy9vs7   condescending_jepsen.2   alpine:latest   testpc    Running         Running about a minute ago
+ohb2jrr3lhcx   condescending_jepsen.3   alpine:latest   testpc    Running         Running about a minute ago
+qmuen4zlk09n   condescending_jepsen.4   alpine:latest   testpc    Running         Running about a minute ago
+root@testpc:~/docker-repo#
+```
+
+And to determine which container are running those services we can check using below:
+```
+root@testpc:~/docker-repo# docker container ps | grep `docker service ps condescending_jepsen | awk  '{ print $1 }' | grep -v 'ID' | awk 'ORS="\|"'`
+CONTAINER ID   IMAGE           COMMAND                 CREATED          STATUS          PORTS     NAMES
+d7ca5b370392   alpine:latest   "ping www.google.com"   9 minutes ago    Up 9 minutes              condescending_jepsen.3.ohb2jrr3lhcxh7qc11qkx3sqw       
+ae61b5485176   alpine:latest   "ping www.google.com"   9 minutes ago    Up 9 minutes              condescending_jepsen.2.up37jsvy9vs7kqgg6fask4y7c       
+7fa93ffa6b60   alpine:latest   "ping www.google.com"   9 minutes ago    Up 9 minutes              condescending_jepsen.4.qmuen4zlk09nkkc68r2wnj1do       
+09e55bcc0bdb   alpine:latest   "ping www.google.com"   19 minutes ago   Up 19 minutes             condescending_jepsen.1.qjra5frhgktppq7br1lcbgqk3       
+root@testpc:~/docker-repo#
+```
