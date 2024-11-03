@@ -219,41 +219,110 @@ root@testpc:~# for i in 1 2 3
 root@testpc:~#
 ```
 
-None of them active, now lets initialized the swarm
+Now we will build clusters and add nodes:
 ```
-root@testpc1:~# docker swarm init --advertise-addr 192.168.227.131
-Swarm initialized: current node (camxvni52okcuppw615go7jo3) is now a manager.
+root@testpc:~# docker node --help
 
-To add a worker to this swarm, run the following command:
+Usage:  docker node COMMAND
 
-    docker swarm join --token SWMTKN-1-63g8stbity50hslye0lhwszxgvehmwomxk8btxam2mn5kpi7ct-08cp8hjt1jgbt34w60rtqozuo 192.168.227.131:2377
+Manage Swarm nodes
 
-To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+Commands:
+  demote      Demote one or more nodes from manager in the swarm
+  inspect     Display detailed information on one or more nodes
+  ls          List nodes in the swarm
+  promote     Promote one or more nodes to manager in the swarm
+  ps          List tasks running on one or more nodes, defaults to current node
+  rm          Remove one or more nodes from the swarm
+  update      Update a node
 
-root@testpc1:~#
-root@testpc2:~# docker swarm init --advertise-addr 192.168.227.130
-Swarm initialized: current node (jdvqwbsp84vpo352us71lvr26) is now a manager.
+Run 'docker node COMMAND --help' for more information on a command.
+root@testpc:~# 
+```
+We can add nodes in docker swarm using the tokens and if we want to get tokens as below:
+```
+root@testpc:~# docker swarm join-token manager
+To add a manager to this swarm, run the following command:
 
-To add a worker to this swarm, run the following command:
+    docker swarm join --token SWMTKN-1-5v3ijd1h6uo602kv1sfeh2iauifs24sv9kd5z6lxlav02k8u4g-cs1taapbb0vr8a7iia9mqtlzd 192.168.227.128:2377
 
-    docker swarm join --token SWMTKN-1-6bkm0xpfxbkswmxf3nsc383m7suq8t981humnie9a11zff635d-euhtunexymqworkmt1ntq882b 192.168.227.130:2377
+root@testpc:~# 
+```
+Now lets add the node one by one:
+```
+root@testpc1:~# docker swarm join --token SWMTKN-1-5v3ijd1h6uo602kv1sfeh2iauifs24sv9kd5z6lxlav02k8u4g-cs1taapbb0vr8a7iia9mqtlzd 192.168.227.128:2377
+This node joined a swarm as a manager.
+root@testpc1:~# 
+```
 
-To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+If Docker swarm is initialized you may get below error and need to leave the swram forced follow:
+```
+root@testpc2:~# docker swarm join --token SWMTKN-1-5v3ijd1h6uo602kv1sfeh2iauifs24sv9kd5z6lxlav02k8u4g-cs1taapbb0vr8a7iia9mqtlzd 192.168.227.128:2377
+Error response from daemon: This node is already part of a swarm. Use "docker swarm leave" to leave this swarm and join another one.
+root@testpc2:~# docker swarm leave --force
+Node left the swarm.
+root@testpc2:~# docker swarm join --token SWMTKN-1-5v3ijd1h6uo602kv1sfeh2iauifs24sv9kd5z6lxlav02k8u4g-cs1taapbb0vr8a7iia9mqtlzd 192.168.227.128:2377
+This node joined a swarm as a manager.
+root@testpc2:~# 
+root@testpc3:~# docker swarm join --token SWMTKN-1-5v3ijd1h6uo602kv1sfeh2iauifs24sv9kd5z6lxlav02k8u4g-cs1taapbb0vr8a7iia9mqtlzd 192.168.227.128:2377
+This node joined a swarm as a manager.
+root@testpc3:~# 
+```
+Now lets see the nodes info:
+```
+root@testpc:~# docker node ls
+ID                            HOSTNAME              STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+xeruvdjd3sal5z1ybb5qspwi6 *   testpc                Ready     Active         Leader           20.10.17
+8ijx60ucfzwb13iewk9t9gylj     testpc1.localdomain   Ready     Active         Reachable        20.10.17
+eoqu84doijqaxz1i4hznznjgz     testpc2.localdomain   Ready     Active         Reachable        20.10.17
+tecz6jl64zcjs7lwsn9x2at9m     testpc3.localdomain   Ready     Active         Reachable        20.10.17
+root@testpc:~# 
+```
+Now we will create docker service same as above we created:
+```
+root@testpc:~# docker service create --replicas 8 alpine ping www.google.com
+ffmhs9bui4av3jxn780q9dpoe
+overall progress: 8 out of 8 tasks
+1/8: running   [==================================================>]
+2/8: running   [==================================================>]
+3/8: running   [==================================================>]
+4/8: running   [==================================================>]
+5/8: running   [==================================================>]
+6/8: running   [==================================================>]
+7/8: running   [==================================================>]
+8/8: running   [==================================================>]
+verify: Service converged
+root@testpc:~# 
+root@testpc:~# docker service ls
+ID             NAME              MODE         REPLICAS   IMAGE           PORTS
+ffmhs9bui4av   awesome_khorana   replicated   8/8        alpine:latest
+root@testpc:~# docker service ps awesome_khorana
+ID             NAME                IMAGE           NODE                  DESIRED STATE   CURRENT STATE            ERROR     PORTS
+lcx3lnkqrcbg   awesome_khorana.1   alpine:latest   testpc2.localdomain   Running         Running 37 seconds ago
+zo69tb8ele93   awesome_khorana.2   alpine:latest   testpc3.localdomain   Running         Running 37 seconds ago
+mp09lgri4tbl   awesome_khorana.3   alpine:latest   testpc                Running         Running 34 seconds ago
+nzua7jrxl460   awesome_khorana.4   alpine:latest   testpc1.localdomain   Running         Running 37 seconds ago
+thmbmeek3qoe   awesome_khorana.5   alpine:latest   testpc2.localdomain   Running         Running 37 seconds ago
+xr10rx76v10w   awesome_khorana.6   alpine:latest   testpc3.localdomain   Running         Running 37 seconds ago
+kd5waylolf8s   awesome_khorana.7   alpine:latest   testpc                Running         Running 34 seconds ago
+04s4avqvxqaj   awesome_khorana.8   alpine:latest   testpc1.localdomain   Running         Running 37 seconds ago
+root@testpc:~#
+```
 
-root@testpc2:~#
-root@testpc3:~# docker swarm init --advertise-addr 192.168.227.129
-Swarm initialized: current node (sug8jxezq874tlv3zpuxgkwqo) is now a manager.
-
-To add a worker to this swarm, run the following command:
-
-    docker swarm join --token SWMTKN-1-45rayp78lr6qv9mpyrwuard11g4meeg1m3anv5sxqp7ndka0up-etck1377pvjpt85c1oobmwi9x 192.168.227.129:2377
-
-To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
-
-root@testpc3:~#
-root@testpc:~# for i in 1 2 3 ; do ssh testpc$i docker info | grep Swarm; done
- Swarm: active
- Swarm: active
- Swarm: active
+In above we can see each node has created 2 container on each nodes.
+```
+root@testpc:~# for i in "" 1 2 3; do ssh testpc$i docker container ls; done
+CONTAINER ID   IMAGE           COMMAND                 CREATED         STATUS         PORTS     NAMES
+d2848dab28e5   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.7.kd5waylolf8skytc7947bgoej
+480c2bf60a73   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.3.mp09lgri4tblhfja648iqjq2y
+CONTAINER ID   IMAGE           COMMAND                 CREATED         STATUS         PORTS     NAMES
+e1d1b866bef1   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.4.nzua7jrxl460nz4ajga90yspp
+91135393ac9f   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.8.04s4avqvxqajdbf1by2u9jmz1
+CONTAINER ID   IMAGE           COMMAND                 CREATED         STATUS         PORTS     NAMES
+9939c59d005c   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.1.lcx3lnkqrcbgj2szj3guw2ira
+39d7e512a060   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.5.thmbmeek3qoeuxja5j6hksraa
+CONTAINER ID   IMAGE           COMMAND                 CREATED         STATUS         PORTS     NAMES
+14523c9d24d4   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.2.zo69tb8ele93yp7ii91tliqay
+5a881ede34e9   alpine:latest   "ping www.google.com"   8 minutes ago   Up 8 minutes             awesome_khorana.6.xr10rx76v10wrkj74316ud4g6
 root@testpc:~#
 ```
