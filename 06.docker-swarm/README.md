@@ -251,4 +251,9 @@ To add a worker to this swarm, run the following command:
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 
 root@testpc3:~#
+root@testpc:~# for i in 1 2 3 ; do ssh testpc$i docker info | grep Swarm; done
+ Swarm: active
+ Swarm: active
+ Swarm: active
+root@testpc:~#
 ```
