@@ -200,3 +200,55 @@ root@testpc:~/docker-repo# docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 root@testpc:~/docker-repo# 
 ```
+
+Now we will create three more hosts for testing of Docker swarm and create passwordless connection for our flexibility:
+1. testpc
+2. testpc1
+3. testpc2
+4. testpc3
+
+Lets check the docker swarm in each newly added nodes:
+```
+root@testpc:~# for i in 1 2 3
+> do
+> ssh testpc$i docker info | grep Swarm
+> done
+ Swarm: inactive
+ Swarm: inactive
+ Swarm: inactive
+root@testpc:~#
+```
+
+None of them active, now lets initialized the swarm
+```
+root@testpc1:~# docker swarm init --advertise-addr 192.168.227.131
+Swarm initialized: current node (camxvni52okcuppw615go7jo3) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-63g8stbity50hslye0lhwszxgvehmwomxk8btxam2mn5kpi7ct-08cp8hjt1jgbt34w60rtqozuo 192.168.227.131:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+root@testpc1:~#
+root@testpc2:~# docker swarm init --advertise-addr 192.168.227.130
+Swarm initialized: current node (jdvqwbsp84vpo352us71lvr26) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-6bkm0xpfxbkswmxf3nsc383m7suq8t981humnie9a11zff635d-euhtunexymqworkmt1ntq882b 192.168.227.130:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+root@testpc2:~#
+root@testpc3:~# docker swarm init --advertise-addr 192.168.227.129
+Swarm initialized: current node (sug8jxezq874tlv3zpuxgkwqo) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-45rayp78lr6qv9mpyrwuard11g4meeg1m3anv5sxqp7ndka0up-etck1377pvjpt85c1oobmwi9x 192.168.227.129:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+root@testpc3:~#
+```
