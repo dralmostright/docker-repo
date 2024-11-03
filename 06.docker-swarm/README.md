@@ -13,7 +13,7 @@ Docker Swarm have two types of Nodes [Master/Worker]. Every swarm must have one 
 
 ### Docker swarm terminology
 
-* Toolkit specific to Docker swarm is ```swarkit```. Docker hosts which run in ```swarm mode`` acts as managers and workes which run swarm services.
+* Toolkit specific to Docker swarm is ```swarkit```. Docker hosts which run in ```swarm mode``` acts as managers and workes which run swarm services.
 * Host : It can be a manager, worker or both
 * service : It can be services like database, web etc. where you define its optimal state (network, storage, replicas ..)
 * Task: Task is a running container which is part of swarm service and managed by a swarm manager
