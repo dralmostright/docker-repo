@@ -2,7 +2,7 @@ version: "3"
 services:
   # Service Name Defined as web
   web:
-    image: web:latest 
+    image: web:v1
     # Command used to deploy the Service
     deploy:
       # Run 5 instances of that image as a service called web

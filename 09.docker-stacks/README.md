@@ -68,7 +68,7 @@ version: "3"
 services:
   # Service Name Defined as web
   web:
-    image: web:latest 
+    image: web:v1 
     # Command used to deploy the Service
     deploy:
       # Run 5 instances of that image as a service called web
@@ -90,6 +90,13 @@ services:
 networks:
   webnet:
 ```
+What will above yml file do:
+1. check for image web with latest tag
+2. Run 5 instances of the service called web
+3. Limit each service to 10% CPU and 50M of RAM
+4. Restart container immediately if it fails
+6. Instruc web's containers to share port 80 to 4000 outsiders via load-balanced network called webnet
+7. Define the webnet network with the default settings which is a load balanced overlay network, and it will be created first and used by the image.
 
 Now lets build the image:
 ```
@@ -157,3 +164,41 @@ REPOSITORY                              TAG        IMAGE ID       CREATED       
 web                                     v1         09dbfea10f44   58 seconds ago   159MB
 root@testpc:~/docker-repo/09.docker-stacks/app#
 ```
+Now lets deploy the docker stack:
+```
+root@testpc:~# docker stack --help
+
+Usage:  docker stack [OPTIONS] COMMAND
+
+Manage Docker stacks
+
+Options:
+      --orchestrator string   Orchestrator to use (swarm|kubernetes|all)
+
+Commands:
+  deploy      Deploy a new stack or update an existing stack
+  ls          List stacks
+  ps          List the tasks in the stack
+  rm          Remove one or more stacks
+  services    List the services in the stack
+
+Run 'docker stack COMMAND --help' for more information on a command.
+root@testpc:~# 
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack deploy -c docker-compose.yml webapp
+Creating network webapp_webnet
+Creating service webapp_web
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+```
+As shown above network and service are created with prefix webapp.
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# docker network ls | grep "NETWORK\|webapp"
+NETWORK ID     NAME              DRIVER    SCOPE
+skyou62m6pbw   webapp_webnet     overlay   swarm
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack ls
+NAME      SERVICES   ORCHESTRATOR
+webapp    1          Swarm
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+```
+A single container running in this Service is called Task. So single Service can execute multiple Tasks.
+
