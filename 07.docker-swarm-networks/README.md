@@ -64,5 +64,7 @@ root@testpc:~#
 
 Now lets configure and test if drupal is able to connect database or not:
 ![drupal conf](./imgs/img1.png)
+
 ![drupal conf](./imgs/img2.png)
+
 ![drupal conf](./imgs/img3.png)
