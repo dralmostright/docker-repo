@@ -424,3 +424,131 @@ root@testpc:~/docker-repo/09.docker-stacks/app#
 Now lets visit our web app again and see how things are looking:
 ![Alt text](imgs/img3.jpg)
 We can see the data has been preserved.
+
+Now lets remove the docker stack:
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack rm webapp
+Removing service webapp_redis
+Removing service webapp_visualizer
+Removing service webapp_web
+Removing network webapp_webnet
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app#
+```
+
+Now finally we will test distributing voting app. Lets prepare the docker yaml file.
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# cat docker-stack.yml
+# this file is meant for Docker Swarm stacks only
+# trying it in compose will fail because of multiple replicas trying to bind to the same port
+# Swarm currently does not support Compose Spec, so we'll pin to the older version 3.9
+
+version: "3.9"
+
+services:
+
+  redis:
+    image: redis:alpine
+    networks:
+      - frontend
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  vote:
+    image: dockersamples/examplevotingapp_vote
+    ports:
+      - 8080:80
+    networks:
+      - frontend
+    deploy:
+      replicas: 2
+
+  result:
+    image: dockersamples/examplevotingapp_result
+    ports:
+      - 8081:80
+    networks:
+      - backend
+
+  worker:
+    image: dockersamples/examplevotingapp_worker
+    networks:
+      - frontend
+      - backend
+    deploy:
+      replicas: 2
+
+  visualizer:
+        image: dockersamples/visualizer:stable
+        ports:
+                - "8082:8080"
+        stop_grace_period: 1m30s
+        volumes:
+                - "/var/run/docker.sock:/var/run/docker.sock"    
+        deploy:
+           placement:
+                   constraints: [node.role== manager]
+        networks:
+                - frontend
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:
+root@testpc:~/docker-repo/09.docker-stacks/app#
+```
+Now lets deploy the stack
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack deploy -c docker-stack.yml voteingstack
+Creating network voteingstack_frontend
+Creating network voteingstack_backend
+Creating service voteingstack_worker
+Creating service voteingstack_visualizer
+Creating service voteingstack_redis
+Creating service voteingstack_db
+Creating service voteingstack_vote
+Creating service voteingstack_result
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack ls
+NAME           SERVICES   ORCHESTRATOR
+voteingstack   6          Swarm
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack ps voteingstack 
+ID             NAME                        IMAGE                                          NODE                  DESIRED STATE   CURRENT STATE                ERROR     PORTS
+t0y96u25aqzv   voteingstack_db.1           postgres:15-alpine                             testpc2.localdomain   Running         Running about a minute ago
+18ardtcjrvug   voteingstack_redis.1        redis:alpine                                   testpc3.localdomain   Running         Running 58 seconds ago
+jpkgbqfvx90g   voteingstack_result.1       dockersamples/examplevotingapp_result:latest   testpc1.localdomain   Running         Running 55 seconds ago
+2tt1xlstw85a   voteingstack_visualizer.1   dockersamples/visualizer:stable                testpc                Running         Running about a minute ago
+om21fqg90j0d   voteingstack_vote.1         dockersamples/examplevotingapp_vote:latest     testpc                Running         Running about a minute ago
+pzh7mnkluuc7   voteingstack_vote.2         dockersamples/examplevotingapp_vote:latest     testpc3.localdomain   Running         Running 59 seconds ago
+q0xd98qgsz1r   voteingstack_worker.1       dockersamples/examplevotingapp_worker:latest   testpc2.localdomain   Running         Running about a minute ago
+wusnx4kbvw9i   voteingstack_worker.2       dockersamples/examplevotingapp_worker:latest   testpc1.localdomain   Running         Running about a minute ago
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack services voteingstack 
+ID             NAME                      MODE         REPLICAS   IMAGE                                          PORTS
+uacnakrn4e0b   voteingstack_db           replicated   1/1        postgres:15-alpine
+sr7lvlyqd6zc   voteingstack_redis        replicated   1/1        redis:alpine
+topql31ojxze   voteingstack_result       replicated   1/1        dockersamples/examplevotingapp_result:latest   *:8081->80/tcp
+x3yz2av8g1br   voteingstack_visualizer   replicated   1/1        dockersamples/visualizer:stable                *:8082->8080/tcp
+vp92mpkvrez5   voteingstack_vote         replicated   2/2        dockersamples/examplevotingapp_vote:latest     *:8080->80/tcp
+thm99mfept6s   voteingstack_worker       replicated   2/2        dockersamples/examplevotingapp_worker:latest   
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app# docker service logs voteingstack_worker
+voteingstack_worker.1.q0xd98qgsz1r@testpc2.localdomain    | Waiting for db
+voteingstack_worker.1.q0xd98qgsz1r@testpc2.localdomain    | Connected to db
+voteingstack_worker.1.q0xd98qgsz1r@testpc2.localdomain    | Found redis at 10.0.5.10
+voteingstack_worker.1.q0xd98qgsz1r@testpc2.localdomain    | Connecting to redis
+voteingstack_worker.2.wusnx4kbvw9i@testpc1.localdomain    | Waiting for db
+voteingstack_worker.2.wusnx4kbvw9i@testpc1.localdomain    | Connected to db
+voteingstack_worker.2.wusnx4kbvw9i@testpc1.localdomain    | Found redis at 10.0.5.10
+voteingstack_worker.2.wusnx4kbvw9i@testpc1.localdomain    | Connecting to redis
+root@testpc:~/docker-repo/09.docker-stacks/app#
+```
