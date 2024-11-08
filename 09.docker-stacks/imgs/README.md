@@ -345,5 +345,3 @@ q3hiaokb7i1h   webapp_visualizer   replicated   1/1        dockersamples/visuali
 ojrrn3btkv2c   webapp_web          replicated   5/6        web:v1                            *:4000->80/tcp
 root@testpc:~/docker-repo/09.docker-stacks/app#
 ```
-And the visualizer looks like below:
-![Alt text](imgs/img1.jpg)
