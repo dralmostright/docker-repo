@@ -347,3 +347,35 @@ root@testpc:~/docker-repo/09.docker-stacks/app#
 ```
 And the visualizer looks like below:
 ![Alt text](imgs/img1.jpg)
+
+Now we will look on presistance data problem with regards to docker stack. This will be a problem as the docker services can run on any of the node as it can failover to any node or it can run in any node and the volume may not present in another node. So how to solve this problem. We will mount the container directory with our local host directory and we can restrict the service to execute on specific node. So we will extend our problem by adding a new service for Redis.
+
+We have made few changes to the docker yaml file ```command: redis-server --appendonly yes``` which implies the contents will not be overwritten everytime the node is started insted it will append only.
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack deploy -c docker-compose.yml webapp
+Updating service webapp_web (id: ojrrn3btkv2ceqnte1kzord5a)
+image web:v1 could not be accessed on a registry to record
+its digest. Each node will access web:v1 independently,
+possibly leading to different nodes running different
+versions of the image.
+
+Updating service webapp_visualizer (id: q3hiaokb7i1hvkrp9mgzh24aa)
+Creating service webapp_redis
+root@testpc:~/docker-repo/09.docker-stacks/app#
+root@testpc:~/docker-repo/09.docker-stacks/app# docker service ls
+ID             NAME                MODE         REPLICAS   IMAGE                             PORTS
+ryyd20ezvkq4   webapp_redis        replicated   1/1        redis:latest                      *:6379->6379/tcp
+q3hiaokb7i1h   webapp_visualizer   replicated   1/1        dockersamples/visualizer:stable   *:8080->8080/tcp
+ojrrn3btkv2c   webapp_web          replicated   6/6        web:v1                            *:4000->80/tcp
+root@testpc:~/docker-repo/09.docker-stacks/app#
+root@testpc:~/docker-repo/09.docker-stacks/app# docker service ps webapp_redis
+ID             NAME             IMAGE          NODE      DESIRED STATE   CURRENT STATE            ERROR     PORTS
+wkf8ou29s4y7   webapp_redis.1   redis:latest   testpc    Running         Running 32 seconds ago
+root@testpc:~/docker-repo/09.docker-stacks/app# docker container ls
+CONTAINER ID   IMAGE          COMMAND                  CREATED              STATUS              PORTS      NAMES
+df36b86cdf1d   redis:latest   "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp   webapp_redis.1.wkf8ou29s4y73i98hgud74zcs
+5f14ef5cb0fe   web:v1         "python app.py"          56 minutes ago       Up 56 minutes       80/tcp     webapp_web.1.jdk8gaopwi63wp263f12l81m4
+root@testpc:~/docker-repo/09.docker-stacks/app#
+```
