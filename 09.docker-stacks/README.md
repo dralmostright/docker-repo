@@ -202,3 +202,40 @@ root@testpc:~/docker-repo/09.docker-stacks/app#
 ```
 A single container running in this Service is called Task. So single Service can execute multiple Tasks.
 
+
+Now if we check the services running under the docker stack we created we can use below:
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack services webapp
+ID             NAME         MODE         REPLICAS   IMAGE     PORTS
+ojrrn3btkv2c   webapp_web   replicated   5/5        web:v1    *:4000->80/tcp
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app# docker service ps  webapp_web
+ID             NAME               IMAGE     NODE                  DESIRED STATE   CURRENT STATE             ERROR                     PORTS
+l0vk4ex09c34   webapp_web.1       web:v1    testpc                Running         Running 13 minutes ago
+t5d9xqkcs8v9    \_ webapp_web.1   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+0mw3supzz2h2    \_ webapp_web.1   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+wgz1yu0dxf9y    \_ webapp_web.1   web:v1    testpc2.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+n36xizgd3rku    \_ webapp_web.1   web:v1    testpc2.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+n4qycei5cyad   webapp_web.2       web:v1    testpc                Running         Running 13 minutes ago
+jd1teke56acm    \_ webapp_web.2   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+o99tkuhqrr03    \_ webapp_web.2   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+hmhwl2uiqnr2    \_ webapp_web.2   web:v1    testpc2.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+gg6inh81h8l0    \_ webapp_web.2   web:v1    testpc1.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+i59au9o4hiqg   webapp_web.3       web:v1    testpc                Running         Running 13 minutes ago
+z5mipof90yjy    \_ webapp_web.3   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+eipd4e8e0gpi    \_ webapp_web.3   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+pzo5s9imnpnx    \_ webapp_web.3   web:v1    testpc2.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"   
+pzsrzpgby2ve    \_ webapp_web.3   web:v1    testpc1.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+nvzr1nsv4q1q   webapp_web.4       web:v1    testpc                Running         Running 13 minutes ago
+tpuvo37rj81z    \_ webapp_web.4   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+grh0o5uqvj1i    \_ webapp_web.4   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+8yutgsofnew0    \_ webapp_web.4   web:v1    testpc2.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+snvtfuuy4slc    \_ webapp_web.4   web:v1    testpc1.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+o5em8a4rybf4   webapp_web.5       web:v1    testpc                Running         Running 14 minutes ago
+1ucivr98vbns    \_ webapp_web.5   web:v1    testpc3.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+m0kdvyw2k3hs    \_ webapp_web.5   web:v1    testpc2.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+xknaktn6slgm    \_ webapp_web.5   web:v1    testpc1.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+l420sun298m8    \_ webapp_web.5   web:v1    testpc1.localdomain   Shutdown        Rejected 14 minutes ago   "No such image: web:v1"
+root@testpc:~/docker-repo/09.docker-stacks/app#
+```
+As we can see its not able to start on other services, that because we don't have image created on other nodes.
