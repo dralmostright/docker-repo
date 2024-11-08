@@ -379,3 +379,47 @@ df36b86cdf1d   redis:latest   "docker-entrypoint.s…"   About a minute ago   Up
 5f14ef5cb0fe   web:v1         "python app.py"          56 minutes ago       Up 56 minutes       80/tcp     webapp_web.1.jdk8gaopwi63wp263f12l81m4
 root@testpc:~/docker-repo/09.docker-stacks/app#
 ```
+
+Now lets visit our application which we deployed:
+![Alt text](imgs/img2.jpg)
+
+Now lets remove the redis database and explore:
+
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# docker service rm webapp_redis
+webapp_redis
+root@testpc:~/docker-repo/09.docker-stacks/app# docker service ls
+ID             NAME                MODE         REPLICAS   IMAGE                             PORTS
+q3hiaokb7i1h   webapp_visualizer   replicated   1/1        dockersamples/visualizer:stable   *:8080->8080/tcp
+ojrrn3btkv2c   webapp_web          replicated   6/6        web:v1                            *:4000->80/tcp
+root@testpc:~/docker-repo/09.docker-stacks/app#
+root@testpc:~/bindmount/pgdata# ls -ltr
+total 8
+drwx------ 2 systemd-coredump systemd-coredump 4096 Nov  7 19:28 appendonlydir
+-rw------- 1 systemd-coredump systemd-coredump  104 Nov  7 19:36 dump.rdb
+root@testpc:~/bindmount/pgdata# pwd
+/root/bindmount/pgdata
+root@testpc:~/bindmount/pgdata#
+```
+We can see that the data exists in the pysical directory, now lets again start the docker:
+```
+root@testpc:~/docker-repo/09.docker-stacks/app# docker stack depl
+oy -c docker-compose.yml webapp
+Updating service webapp_visualizer (id: q3hiaokb7i1hvkrp9mgzh24aa)
+Creating service webapp_redis
+Updating service webapp_web (id: ojrrn3btkv2ceqnte1kzord5a)
+image web:v1 could not be accessed on a registry to record
+its digest. Each node will access web:v1 independently,
+possibly leading to different nodes running different
+versions of the image.
+
+root@testpc:~/docker-repo/09.docker-stacks/app# 
+root@testpc:~/docker-repo/09.docker-stacks/app# docker service ls
+ID             NAME                MODE         REPLICAS   IMAGE                             PORTS
+xp2bclcfr6ou   webapp_redis        replicated   1/1        redis:latest                      *:6379->6379/tcp
+q3hiaokb7i1h   webapp_visualizer   replicated   1/1        dockersamples/visualizer:stable   *:8080->8080/tcp
+ojrrn3btkv2c   webapp_web          replicated   6/6        web:v1                            *:4000->80/tcp
+root@testpc:~/docker-repo/09.docker-stacks/app#
+```
+Now lets visit our web app again and see how things are looking:
+![Alt text](imgs/img3.jpg)
