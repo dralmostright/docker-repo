@@ -423,3 +423,4 @@ root@testpc:~/docker-repo/09.docker-stacks/app#
 ```
 Now lets visit our web app again and see how things are looking:
 ![Alt text](imgs/img3.jpg)
+We can see the data has been preserved.
