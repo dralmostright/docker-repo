@@ -14,6 +14,16 @@ services:
         POSTGRES_PASSWORD_FILE: /run/secrets/db_password
         POSTGRES_USER_FILE: /run/secrets/db_username
 
+  centOS:
+         image: centos
+         deploy: 
+                replicas: 1
+         entrypoint: /bin/sh
+         stdin_open: true
+         tty: true
+         secrets:
+            - source: my-secret
+
 secrets:
   db_username:
     file: ./dockSecrets/user.txt

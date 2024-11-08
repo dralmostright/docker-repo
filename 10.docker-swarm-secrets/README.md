@@ -168,3 +168,32 @@ dralmostright
 root@005131efc140:/#
 ```
 
+Now lets try with services which uses external secrets:
+```
+root@testpc:~/docker-repo# echo "external" | docker secret create my-secret -
+rhu74q9a8woybrqp2r0w0061m
+root@testpc:~/docker-repo#
+root@testpc:~/docker-repo/10.docker-swarm-secrets# docker stack deploy -c docker-compose.yml postgresdb
+Creating secret postgresdb_db_password
+Creating secret postgresdb_db_username
+Creating service postgresdb_centOS
+Creating service postgresdb_postgresDB
+root@testpc:~/docker-repo/10.docker-swarm-secrets# 
+root@testpc:~/docker-repo/10.docker-swarm-secrets# docker stack services postgresdb 
+ID             NAME                    MODE         REPLICAS   IMAGE             PORTS
+v858i0yect37   postgresdb_centOS       replicated   1/1        centos:latest     
+1mqpf0jbkoxa   postgresdb_postgresDB   replicated   1/1        postgres:latest   
+root@testpc:~/docker-repo/10.docker-swarm-secrets# docker service ps postgresdb_centOS 
+ID             NAME                  IMAGE           NODE                  DESIRED STATE   CURRENT STATE                ERROR     PORTS
+ourt4sitf093   postgresdb_centOS.1   centos:latest   testpc1.localdomain   Running         Running about a minute ago
+root@testpc:~/docker-repo/10.docker-swarm-secrets# 
+
+root@testpc1:~# docker container ls
+CONTAINER ID   IMAGE           COMMAND     CREATED         STATUS         PORTS     NAMES
+ca1ee8c49ffc   centos:latest   "/bin/sh"   2 minutes ago   Up 2 minutes             postgresdb_centOS.1.ourt4sitf0930frg3ewfc6541
+root@testpc1:~# docker exec -it ca1ee8c49ffc bash
+[root@ca1ee8c49ffc /]# cat /run/secrets/my-secret 
+external
+[root@ca1ee8c49ffc /]#
+```
+
